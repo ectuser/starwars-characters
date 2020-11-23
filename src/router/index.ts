@@ -7,12 +7,19 @@ Vue.use(VueRouter);
 const routes: Array<RouteConfig> = [
   {
     path: "/",
-    name: "Main",
+    name: "Home",
     component: Home,
+  },
+  {
+    path: "/page/:id",
+    name: "Page",
+    component: Home,
+    props: (route) => ({ page: route.query.page }),
   },
   {
     path: "/favorites",
     name: "Favorites",
+
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
