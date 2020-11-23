@@ -1,28 +1,54 @@
 <template>
   <div class="home">
-    <CharacterCard name="123" imgUrl="https://starwars-visualguide.com/assets/img/characters/1.jpg" />
-    <CharacterCard name="123" imgUrl="https://starwars-visualguide.com/assets/img/characters/2.jpg" />
-    <CharacterCard name="123" imgUrl="https://starwars-visualguide.com/assets/img/characters/3.jpg" />
-    <CharacterCard name="123" imgUrl="https://starwars-visualguide.com/assets/img/characters/4.jpg" />
+    
+    <CharacterCard v-for="(item, index) in characters" :key="index + 1"
+      v-bind:name="item.name"
+      v-bind:imgUrl="config.getImageUrl(index + 1)"
+    />
   </div>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
-import CharacterCard from '@/components/CharacterCard'
+import CharacterCard from "../components/CharacterCard";
+import { CharactersApiService } from "../services/characters/api/characters";
+import { AllCharacters } from "../interfaces/all-characters";
+import { Component, Prop, Vue } from "vue-property-decorator";
+import { Character } from "@/interfaces/character";
+import { apiConfig } from "../services/characters/api/api-config";
 
-export default {
-  name: 'Home',
+@Component({
+  name: "Home",
   components: {
-    CharacterCard
+    CharacterCard,
+  },
+})
+export default class Home extends Vue {
+  characters: Character[] = [];
+  config = apiConfig;
+  
+
+  async beforeMount() {
+    let answer: AllCharacters;
+    try {
+      answer = await CharactersApiService.getAll();
+    } catch (error) {
+      console.warn(error);
+      return;
+    }
+    if (answer.results){
+      this.characters = [...answer.results];
+      console.log(this.characters);
+      
+    }
   }
 }
 </script>
 
 <style>
-  .home{
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-  }
+.home {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
 </style>
