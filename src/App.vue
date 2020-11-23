@@ -4,6 +4,7 @@
       <h3 class="md-title" style="flex: 1">Star Wars</h3>
       <md-button to="/">Home</md-button>
       <md-button to="/favorites">Favorites</md-button>
+      <md-button to="/search">Search</md-button>
     </md-toolbar>
     <router-view/>
   </div>

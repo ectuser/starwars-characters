@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../views/Home.vue";
+import SearchComponent from "@/components/Search.vue";
 
 Vue.use(VueRouter);
 
@@ -14,7 +15,11 @@ const routes: Array<RouteConfig> = [
     path: "/page/:id",
     name: "Page",
     component: Home,
-    props: (route) => ({ page: route.query.page }),
+  },
+  {
+    path: "/search",
+    name: "Search",
+    component: SearchComponent,
   },
   {
     path: "/favorites",

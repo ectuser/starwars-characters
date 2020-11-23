@@ -2,6 +2,7 @@
   <div class="home">
     <div class="pagination">
       <md-button class="md-primary" :to="`/page/${pageNumber - 1}`" :disabled="pageNumber <= 1">Previous</md-button>
+      <md-button>{{pageNumber}}</md-button>
       <md-button class="md-accent" :to="`/page/${pageNumber + 1}`" :disabled="pageNumber === Math.floor(numberOfCharacters / 10)">Next</md-button>
     </div>
     <CharacterCard v-for="(item, index) in characters" :key="transformIndex(index, pageNumber)"
@@ -13,7 +14,7 @@
 
 <script lang="ts">
 // @ is an alias to /src
-import CharacterCard from "../components/CharacterCard";
+import CharacterCard from "../components/CharacterCard.vue";
 import { CharactersApiService } from "../services/characters/api/characters";
 import { AllCharacters } from "../interfaces/all-characters";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";

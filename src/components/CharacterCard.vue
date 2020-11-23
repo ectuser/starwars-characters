@@ -6,6 +6,7 @@
           <div class="md-subhead">Subtitle here</div>
         </md-card-header-text>
         <md-card-media>
+          
           <img :src="imgUrl" alt="People">
         </md-card-media>
       </md-card-header>
