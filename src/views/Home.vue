@@ -35,7 +35,9 @@
       v-for="item in characters"
       :key="item.id"
       v-bind:name="item.name"
+      v-bind:id="item.id"
       v-bind:imgUrl="apiConfig.getImageUrl(item.id)"
+      v-bind:likeCallback="likeCharacter"
     />
   </div>
 </template>
@@ -48,6 +50,7 @@ import { AllCharacters } from "../interfaces/all-characters";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { CharacterInstance } from "@/classes/character-instance";
 import { ApiConfig } from "../constants/api-config";
+import { LikeCharacterService } from "../services/characters/like-character.service";
 
 @Component({
   name: "Home",
@@ -59,6 +62,7 @@ export default class Home extends Vue {
   characters: CharacterInstance[] = [];
   apiConfig = ApiConfig.Instance;
   characterApiService = CharactersApiService.Instance;
+  likeCharacterService = LikeCharacterService.Instance;
   pageNumber: number = 1;
   numberOfCharacters?: number = 0;
   searchData: string = "";
@@ -86,33 +90,46 @@ export default class Home extends Vue {
     } catch (error) {
       this.pageNumber = 1;
     }
-    this.searchData = this.$route.query.search ? this.$route.query.search.toString() : "";
+    this.searchData = this.$route.query.search
+      ? this.$route.query.search.toString()
+      : "";
   }
 
   async setDataFromService() {
     let answer: AllCharacters;
     try {
-      answer = await this.characterApiService
-        .getCharactersFromPage(this.pageNumber, this.searchData);
+      answer = await this.characterApiService.getCharactersFromPage(
+        this.pageNumber,
+        this.searchData
+      );
     } catch (error) {
       console.warn(error);
       return;
     }
     if (answer.results) {
-      this.characters = answer.results.map(apiCharacter => new CharacterInstance(apiCharacter));
+      this.characters = answer.results.map(
+        (apiCharacter) => new CharacterInstance(apiCharacter)
+      );
       console.log(this.characters);
     }
     this.numberOfCharacters = answer.count || undefined;
-    this.nextPage = answer.next ? answer.next.replace("http://swapi.dev/api/people", "") : "/";
-    this.previousPage = answer.previous ? answer.previous.replace("http://swapi.dev/api/people", "") : "/";
+    this.nextPage = answer.next
+      ? answer.next.replace("http://swapi.dev/api/people", "")
+      : "/";
+    this.previousPage = answer.previous
+      ? answer.previous.replace("http://swapi.dev/api/people", "")
+      : "/";
     console.log(this.previousPage, this.nextPage);
-    
   }
 
   onSearch() {
-    if (this.searchData){
-      this.$router.push({query: {search: this.searchData}})
+    if (this.searchData) {
+      this.$router.push({ query: { search: this.searchData } });
     }
+  }
+
+  likeCharacter(id: string) {
+    this.likeCharacterService.likeCharacter(id);
   }
 }
 </script>
