@@ -3,9 +3,9 @@
     <CharacterCard
       v-for="item in characters"
       :key="item.id"
-      v-bind:character="item"
-      v-bind:imageUrl="apiConfig.getImageUrl(item.id)"
-      v-bind:likeCallback="likeCharacter"
+      :character="item"
+      :imageUrl="apiConfig.getImageUrl(item.id)"
+      :likeCallback="likeCharacter"
     />
   </div>
 </template>

@@ -35,8 +35,8 @@
       v-for="item in characters"
       :key="item.id"
       :character="item"
-      v-bind:imageUrl="apiConfig.getImageUrl(item.id)"
-      v-bind:likeCallback="likeCharacter"
+      :imageUrl="apiConfig.getImageUrl(item.id)"
+      :likeCallback="likeCharacter"
     />
   </div>
 </template>

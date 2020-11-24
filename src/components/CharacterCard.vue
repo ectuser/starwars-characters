@@ -12,7 +12,7 @@
       </md-card-header>
 
       <md-card-actions>
-        <md-button v-on:click="likeCallback(character)" :class="`md-icon-button${character.isLiked ? ' md-accent' : ''}`">
+        <md-button @click="likeCallback(character)" :class="`md-icon-button${character.isLiked ? ' md-accent' : ''}`">
           <md-icon>favorite</md-icon>
         </md-button>
       </md-card-actions>
