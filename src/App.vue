@@ -2,8 +2,8 @@
   <div id="app">
     <md-toolbar class="md-accent" md-elevation="1">
       <h3 class="md-title" style="flex: 1">Star Wars</h3>
-      <md-button to="/">Home</md-button>
-      <md-button to="/favorites">Favorites</md-button>
+      <md-button class="md-icon-button" to="/"><md-icon>home</md-icon></md-button>
+      <md-button class="md-icon-button" to="/favorites"><md-icon>favorite</md-icon></md-button>
     </md-toolbar>
     <router-view/>
   </div>

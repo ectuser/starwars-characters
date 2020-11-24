@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../views/Home.vue";
+import Favorites from "../views/Favorites.vue";
 
 Vue.use(VueRouter);
 
@@ -11,20 +12,9 @@ const routes: Array<RouteConfig> = [
     component: Home,
   },
   {
-    path: "/page/:id",
-    name: "Page",
-    component: Home,
-    props: (route) => ({ page: route.query.page }),
-  },
-  {
     path: "/favorites",
     name: "Favorites",
-
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
+    component: Favorites,
   },
 ];
 

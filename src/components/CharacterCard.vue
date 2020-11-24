@@ -6,12 +6,13 @@
           <div class="md-subhead">Subtitle here</div>
         </md-card-header-text>
         <md-card-media>
+          
           <img :src="imgUrl" alt="People">
         </md-card-media>
       </md-card-header>
 
       <md-card-actions>
-        <md-button class="md-icon-button">
+        <md-button v-on:click="likeCallback(id)" class="md-icon-button">
           <md-icon>favorite</md-icon>
         </md-button>
       </md-card-actions>
@@ -24,12 +25,14 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 export default class CharacterCard extends Vue {
   @Prop() private name!: string;
   @Prop() private imgUrl!: string;
+  @Prop() private id!: string;
+  @Prop() private likeCallback!: Function;
 }
 </script>
 
 <style>
   .md-card{
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
     margin-bottom: 20px;
   }
