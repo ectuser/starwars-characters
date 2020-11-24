@@ -10,8 +10,7 @@ export class CharacterInstance implements ApiCharacter {
   constructor(protected source: Partial<ApiCharacter> = {}) {}
 
   extractIdFromUrl() {
-    return parseInt(
-      this.url.replace("http://swapi.dev/api/people/", "")
-    ).toString();
+    const re = new RegExp(`http(s)?://[a-z]+\.[a-z]+/[a-z]+/people/`, "i");
+    return parseInt(this.url.replace(re, "")).toString();
   }
 }

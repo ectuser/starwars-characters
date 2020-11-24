@@ -112,11 +112,12 @@ export default class Home extends Vue {
   }
 
   setPreviousNextPages(response: CharactersApiResponse){
+    const re = new RegExp(`http(s)?://[a-z]+\.[a-z]+/[a-z]+/people/`, "i")
     this.nextPage = response.next
-      ? response.next.replace("http://swapi.dev/api/people", "")
+      ? response.next.replace(re, "")
       : "/";
     this.previousPage = response.previous
-      ? response.previous.replace("http://swapi.dev/api/people", "")
+      ? response.previous.replace(re, "")
       : "/";
   }
 
