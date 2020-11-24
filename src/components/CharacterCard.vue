@@ -2,31 +2,31 @@
   <md-card>
       <md-card-header>
         <md-card-header-text>
-          <div class="md-title">{{name}}</div>
+          <div class="md-title">{{character.name}}</div>
           <div class="md-subhead">Subtitle here</div>
         </md-card-header-text>
         <md-card-media>
           
-          <img :src="imgUrl" alt="People">
+          <img :src="imageUrl" alt="People">
         </md-card-media>
       </md-card-header>
 
       <md-card-actions>
-        <md-button v-on:click="likeCallback(id)" class="md-icon-button">
+        <md-button v-on:click="likeCallback(character)" :class="`md-icon-button${character.isLiked ? ' md-accent' : ''}`">
           <md-icon>favorite</md-icon>
         </md-button>
       </md-card-actions>
     </md-card>
 </template>
 <script lang="ts">
+import { CharacterInstance } from '@/classes/character-instance';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
 export default class CharacterCard extends Vue {
-  @Prop() private name!: string;
-  @Prop() private imgUrl!: string;
-  @Prop() private id!: string;
   @Prop() private likeCallback!: Function;
+  @Prop() private character!: CharacterInstance;
+  @Prop() private imageUrl!: string;
 }
 </script>
 

@@ -1,3 +1,4 @@
+import { CharacterInstance } from "@/classes/character-instance";
 import { LikedCharactersApiService } from "./api/liked-characters-api.service";
 export class LikeCharacterService {
   private static instance: LikeCharacterService;
@@ -35,12 +36,24 @@ export class LikeCharacterService {
   }
 
   async getLikedCharacters() {
+    const characterIds = this.getLikedCharacterIds();
+    if (characterIds.length === 0) {
+      return [];
+    }
+    const response = await this.likedCharactersApiService.getLikedCharacters(
+      characterIds
+    );
+    return response.map((character: CharacterInstance) => {
+      character.isLiked = true;
+      return character;
+    });
+  }
+
+  getLikedCharacterIds() {
     const characterIdsStr = localStorage.getItem("characterIds");
     if (characterIdsStr) {
       const characterIds: string[] = JSON.parse(characterIdsStr);
-      return await this.likedCharactersApiService.getLikedCharacters(
-        characterIds
-      );
+      return characterIds;
     }
     return [];
   }
