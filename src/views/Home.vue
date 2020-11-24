@@ -34,9 +34,8 @@
     <CharacterCard
       v-for="item in characters"
       :key="item.id"
-      v-bind:name="item.name"
-      v-bind:id="item.id"
-      v-bind:imgUrl="apiConfig.getImageUrl(item.id)"
+      :character="item"
+      v-bind:imageUrl="apiConfig.getImageUrl(item.id)"
       v-bind:likeCallback="likeCharacter"
     />
   </div>
@@ -46,11 +45,12 @@
 // @ is an alias to /src
 import CharacterCard from "../components/CharacterCard.vue";
 import { CharactersApiService } from "../services/characters/api/characters-api.service";
-import { AllCharacters } from "../interfaces/all-characters";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { CharacterInstance } from "@/classes/character-instance";
 import { ApiConfig } from "../constants/api-config";
 import { LikeCharacterService } from "../services/characters/like-character.service";
+import { ApiCharacter } from '@/interfaces/api-character';
+import { CharactersApiResponse } from '@/interfaces/characters-api-response';
 
 @Component({
   name: "Home",
@@ -64,62 +64,68 @@ export default class Home extends Vue {
   characterApiService = CharactersApiService.Instance;
   likeCharacterService = LikeCharacterService.Instance;
   pageNumber: number = 1;
-  numberOfCharacters?: number = 0;
   searchData: string = "";
   nextPage: string = "/";
   previousPage: string = "/";
 
-  async mounted() {
-    console.log(this.$route.query);
-
-    this.setDataFromQuery();
-    this.setDataFromService();
-  }
   @Watch("$route")
   onUrlChange() {
+    this.updateList();
+  }
+
+  mounted() {
+    console.log(this.$route.query);
+    this.updateList();
+  }
+
+  async updateList(){
     this.setDataFromQuery();
-    this.setDataFromService();
+    await this.setDataFromService();
+    this.setLikes();
   }
 
   setDataFromQuery() {
-    try {
-      this.pageNumber = Number(this.$route.query.page);
-      if (isNaN(this.pageNumber)) {
-        throw new Error("Not a number");
-      }
-    } catch (error) {
-      this.pageNumber = 1;
-    }
+    const pageNumberFromQuery = Number(this.$route.query.page);
+    this.pageNumber = !isNaN(pageNumberFromQuery) ? pageNumberFromQuery : 1
+
     this.searchData = this.$route.query.search
       ? this.$route.query.search.toString()
       : "";
   }
 
   async setDataFromService() {
-    let answer: AllCharacters;
+    let response: CharactersApiResponse;
     try {
-      answer = await this.characterApiService.getCharactersFromPage(
+      response = await this.characterApiService.getCharactersFromPage(
         this.pageNumber,
         this.searchData
       );
+      this.characters = response.results 
+        ? response.results.map((apiCharacter: ApiCharacter) => new CharacterInstance(apiCharacter)) 
+        : [];
+      this.setPreviousNextPages(response);
+      console.log(this.characters);
     } catch (error) {
       console.warn(error);
       return;
     }
-    if (answer.results) {
-      this.characters = answer.results.map(
-        (apiCharacter) => new CharacterInstance(apiCharacter)
-      );
-      console.log(this.characters);
-    }
-    this.numberOfCharacters = answer.count || undefined;
-    this.nextPage = answer.next
-      ? answer.next.replace("http://swapi.dev/api/people", "")
+  }
+
+  setPreviousNextPages(response: CharactersApiResponse){
+    this.nextPage = response.next
+      ? response.next.replace("http://swapi.dev/api/people", "")
       : "/";
-    this.previousPage = answer.previous
-      ? answer.previous.replace("http://swapi.dev/api/people", "")
+    this.previousPage = response.previous
+      ? response.previous.replace("http://swapi.dev/api/people", "")
       : "/";
-    console.log(this.previousPage, this.nextPage);
+  }
+
+  setLikes(){
+    const likeIds = this.likeCharacterService.getLikedCharacterIds();
+    this.characters = this.characters.map(character => {
+      character.isLiked = likeIds.indexOf(character.id) !== -1 ? true : false;
+      return character;
+    })
   }
 
   onSearch() {
@@ -128,8 +134,14 @@ export default class Home extends Vue {
     }
   }
 
-  likeCharacter(id: string) {
-    this.likeCharacterService.likeCharacter(id);
+  likeCharacter(character: CharacterInstance) {
+    if (!character.isLiked){
+      this.likeCharacterService.likeCharacter(character.id);
+    }
+    else{
+      this.likeCharacterService.dislikeCharacter(character.id);
+    }
+    this.updateList();
   }
 }
 </script>

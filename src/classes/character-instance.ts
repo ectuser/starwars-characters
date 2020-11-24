@@ -1,4 +1,4 @@
-import { ApiCharacter } from "@/interfaces/character";
+import { ApiCharacter } from "@/interfaces/api-character";
 
 export class CharacterInstance implements ApiCharacter {
   name = this.source?.name ?? "";
@@ -6,6 +6,7 @@ export class CharacterInstance implements ApiCharacter {
   mass = this.source?.mass ?? "";
   url = this.source?.url ?? "";
   id = this.source?.url ? this.extractIdFromUrl() : "";
+  isLiked = false;
   constructor(protected source: Partial<ApiCharacter> = {}) {}
 
   extractIdFromUrl() {

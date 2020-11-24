@@ -3,9 +3,8 @@
     <CharacterCard
       v-for="item in characters"
       :key="item.id"
-      v-bind:name="item.name"
-      v-bind:id="item.id"
-      v-bind:imgUrl="apiConfig.getImageUrl(item.id)"
+      v-bind:character="item"
+      v-bind:imageUrl="apiConfig.getImageUrl(item.id)"
       v-bind:likeCallback="likeCharacter"
     />
   </div>
@@ -35,9 +34,17 @@ export default class Favorites extends Vue{
     
   }
 
-  likeCharacter(id: string){
-
+  likeCharacter(character: CharacterInstance) {
+    if (!character.isLiked){
+      this.likeCharacterService.likeCharacter(character.id);
+    }
+    else{
+      this.likeCharacterService.dislikeCharacter(character.id);
+    }
+    this.getLikedCharacters();
   }
+
+  
   
 }
 
