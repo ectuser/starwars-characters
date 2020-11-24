@@ -23,7 +23,7 @@
           <label>Name</label>
           <md-input v-model="searchData"></md-input>
         </md-field>
-        <md-button class="search-button" v-on:click="onSearch()">
+        <md-button class="search-button" @click="onSearch()">
           Search
         </md-button>
         <md-button class="md-accent" to="/">

@@ -11,28 +11,22 @@ export class LikeCharacterService {
     return this.instance;
   }
   likeCharacter(id: string) {
-    const characterIdsStr = localStorage.getItem("characterIds");
-    let characterIds: string[] = [];
-    if (characterIdsStr) {
-      characterIds = JSON.parse(characterIdsStr);
-      characterIds.push(id);
-    } else {
+    let characterIds = this.getLikedCharacterIds();
+    if (characterIds.length === 0) {
       characterIds = [id];
     }
+    characterIds.push(id);
     localStorage.setItem("characterIds", JSON.stringify(characterIds));
   }
   dislikeCharacter(id: string) {
-    const characterIdsStr = localStorage.getItem("characterIds");
-    if (characterIdsStr) {
-      const characterIds: string[] = JSON.parse(characterIdsStr);
-      const characterIndex = characterIds.findIndex((ch) => ch === id);
-      if (characterIndex !== -1) {
-        characterIds.splice(characterIndex, 1);
-        localStorage.setItem("characterIds", JSON.stringify(characterIds));
-        return;
-      }
+    const characterIds = this.getLikedCharacterIds();
+    const characterIndex = characterIds.findIndex((ch) => ch === id);
+    if (characterIndex !== -1) {
+      characterIds.splice(characterIndex, 1);
+      localStorage.setItem("characterIds", JSON.stringify(characterIds));
+    } else {
+      console.warn("Can't find index");
     }
-    throw new Error("Can't get localstorage or index is wrong");
   }
 
   async getLikedCharacters() {
