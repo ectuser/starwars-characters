@@ -1,8 +1,8 @@
-import { Character } from "./character";
+import { ApiCharacter } from "./character";
 
 export interface AllCharacters {
   count?: number;
   next?: string;
   previous?: string;
-  results?: Character[];
+  results?: ApiCharacter[];
 }

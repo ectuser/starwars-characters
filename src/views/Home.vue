@@ -1,13 +1,41 @@
 <template>
   <div class="home">
-    <div class="pagination">
-      <md-button class="md-primary" :to="`/page/${pageNumber - 1}`" :disabled="pageNumber <= 1">Previous</md-button>
-      <md-button>{{pageNumber}}</md-button>
-      <md-button class="md-accent" :to="`/page/${pageNumber + 1}`" :disabled="pageNumber === Math.floor(numberOfCharacters / 10)">Next</md-button>
+    <div class="menu">
+      <div class="pagination">
+        <md-button
+          class="md-primary"
+          :to="previousPage"
+          :disabled="previousPage === '/'"
+        >
+          Previous
+        </md-button>
+        <md-button>{{ pageNumber }}</md-button>
+        <md-button
+          class="md-accent"
+          :to="nextPage"
+          :disabled="nextPage === '/'"
+        >
+          Next
+        </md-button>
+      </div>
+      <div class="search">
+        <md-field class="search-input">
+          <label>Name</label>
+          <md-input v-model="searchData"></md-input>
+        </md-field>
+        <md-button class="search-button" v-on:click="onSearch()">
+          Search
+        </md-button>
+        <md-button class="md-accent" to="/">
+          Reset
+        </md-button>
+      </div>
     </div>
-    <CharacterCard v-for="(item, index) in characters" :key="transformIndex(index, pageNumber)"
+    <CharacterCard
+      v-for="item in characters"
+      :key="item.id"
       v-bind:name="item.name"
-      v-bind:imgUrl="config.getImageUrl(transformIndex(index, pageNumber))"
+      v-bind:imgUrl="apiConfig.getImageUrl(item.id)"
     />
   </div>
 </template>
@@ -15,81 +43,96 @@
 <script lang="ts">
 // @ is an alias to /src
 import CharacterCard from "../components/CharacterCard.vue";
-import { CharactersApiService } from "../services/characters/api/characters";
+import { CharactersApiService } from "../services/characters/api/characters-api.service";
 import { AllCharacters } from "../interfaces/all-characters";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { Character } from "@/interfaces/character";
-import { apiConfig } from "../services/characters/api/api-config";
+import { CharacterInstance } from "@/classes/character-instance";
+import { ApiConfig } from "../constants/api-config";
 
 @Component({
   name: "Home",
   components: {
     CharacterCard,
-  }
+  },
 })
 export default class Home extends Vue {
-  characters: Character[] = [];
-  config = apiConfig;
+  characters: CharacterInstance[] = [];
+  apiConfig = ApiConfig.Instance;
+  characterApiService = CharactersApiService.Instance;
   pageNumber: number = 1;
-  numberOfCharacters: number = 0;
+  numberOfCharacters?: number = 0;
+  searchData: string = "";
+  nextPage: string = "/";
+  previousPage: string = "/";
 
-  
   async mounted() {
     console.log(this.$route.query);
-    
-    this.setPageNumber();
-    this.setCharacters();
+
+    this.setDataFromQuery();
+    this.setDataFromService();
   }
-  @Watch('$route')
-  onUrlChange(){
-    this.setPageNumber();
-    this.setCharacters();
+  @Watch("$route")
+  onUrlChange() {
+    this.setDataFromQuery();
+    this.setDataFromService();
   }
 
-  setPageNumber(){
+  setDataFromQuery() {
     try {
-      this.pageNumber = Number(this.$route.params.id);
-      if (isNaN(this.pageNumber)){
+      this.pageNumber = Number(this.$route.query.page);
+      if (isNaN(this.pageNumber)) {
         throw new Error("Not a number");
       }
     } catch (error) {
       this.pageNumber = 1;
     }
+    this.searchData = this.$route.query.search ? this.$route.query.search.toString() : "";
   }
 
-  async setCharacters(){
+  async setDataFromService() {
     let answer: AllCharacters;
     try {
-      answer = await CharactersApiService.getCharactersFromPage(this.pageNumber);
+      answer = await this.characterApiService
+        .getCharactersFromPage(this.pageNumber, this.searchData);
     } catch (error) {
       console.warn(error);
       return;
     }
-    if (answer.results){
-      this.characters = [...answer.results];
+    if (answer.results) {
+      this.characters = answer.results.map(apiCharacter => new CharacterInstance(apiCharacter));
       console.log(this.characters);
     }
-    if (answer.count){
-      this.numberOfCharacters = answer.count;
-    }
+    this.numberOfCharacters = answer.count || undefined;
+    this.nextPage = answer.next ? answer.next.replace("http://swapi.dev/api/people", "") : "/";
+    this.previousPage = answer.previous ? answer.previous.replace("http://swapi.dev/api/people", "") : "/";
+    console.log(this.previousPage, this.nextPage);
+    
   }
 
-  transformIndex(index: number, page: number): number{
-    return (index + 1) + (page - 1) * 10;
+  onSearch() {
+    if (this.searchData){
+      this.$router.push({query: {search: this.searchData}})
+    }
   }
-  
 }
 </script>
 
 <style>
 .home {
-  margin-top: 10px;
   display: flex;
   flex-direction: column;
   width: 80%;
-  margin: 0 auto;
+  margin: 20px auto 0 auto;
 }
-.pagination{
-  text-align: center;
+.menu {
+  display: flex;
+  flex-direction: row;
+}
+.menu .pagination {
+  flex: 1;
+}
+.menu .search {
+  flex: 1;
+  display: flex;
 }
 </style>

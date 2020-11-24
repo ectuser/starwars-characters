@@ -30,7 +30,7 @@ export default class CharacterCard extends Vue {
 
 <style>
   .md-card{
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
     margin-bottom: 20px;
   }
